@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tap Master</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #0b0f19;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 500px;
+      padding: 25px;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: #9ca3af;
+      margin-bottom: 25px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      background: #151b29;
+      border-radius: 18px;
+      padding: 18px;
+      margin-bottom: 30px;
+    }
+
+    .stat {
+      font-size: 18px;
+    }
+
+    .number {
+      display: block;
+      font-size: 30px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    #tapButton {
+      width: 230px;
+      height: 230px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #3b82f6, #7c3aed);
+      color: white;
+      font-size: 35px;
+      font-weight: bold;
+      box-shadow: 0 15px 40px rgba(59,130,246,.35);
+      cursor: pointer;
+      transition: transform .08s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #tapButton:active {
+      transform: scale(.9);
+    }
+
+    #startButton {
+      margin-top: 30px;
+      padding: 14px 35px;
+      border: none;
+      border-radius: 12px;
+      background: white;
+      color: #111827;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #message {
+      margin-top: 20px;
+      color: #60a5fa;
+      font-size: 18px;
+      min-height: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="game">
+    <h1>🔥 TAP MASTER</h1>
+    <div class="subtitle">Ai là người tap nhanh nhất?</div>
+
+    <div class="stats">
+      <div class="stat">
+        Điểm
+        <span class="number" id="score">0</span>
+      </div>
+
+      <div class="stat">
+        Thời gian
+        <span class="number"><span id="time">10</span>s</span>
+      </div>
+
+      <div class="stat">
+        Kỷ lục
+        <span class="number" id="best">0</span>
+      </div>
+    </div>
+
+    <button id="tapButton" disabled>
+      TAP!
+    </button>
+
+    <br>
+
+    <button id="startButton">
+      BẮT ĐẦU GAME
+    </button>
+
+    <div id="message">
+      Nhấn BẮT ĐẦU để chơi!
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+    let time = 10;
+    let playing = false;
+    let timer;
+
+    const scoreEl = document.getElementById("score");
+    const timeEl = document.getElementById("time");
+    const bestEl = document.getElementById("best");
+    const tapButton = document.getElementById("tapButton");
+    const startButton = document.getElementById("startButton");
+    const message = document.getElementById("message");
+
+    let best = localStorage.getItem("tapMasterBest") || 0;
+    bestEl.textContent = best;
+
+    startButton.addEventListener("click", startGame);
+
+    tapButton.addEventListener("click", () => {
+      if (!playing) return;
+
+      score++;
+      scoreEl.textContent = score;
+
+      if (navigator.vibrate) {
+        navigator.vibrate(10);
+      }
+    });
+
+    function startGame() {
+      score = 0;
+      time = 10;
+      playing = true;
+
+      scoreEl.textContent = score;
+      timeEl.textContent = time;
+
+      tapButton.disabled = false;
+      startButton.disabled = true;
+
+      message.textContent = "TAP THẬT NHANH! 🔥";
+
+      clearInterval(timer);
+
+      timer = setInterval(() => {
+        time--;
+        timeEl.textContent = time;
+
+        if (time <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    function endGame() {
+      clearInterval(timer);
+
+      playing = false;
+      tapButton.disabled = true;
+      startButton.disabled = false;
+
+      if (score > best) {
+        best = score;
+        localStorage.setItem("tapMasterBest", best);
+        bestEl.textContent = best;
+        message.textContent = "🏆 KỶ LỤC MỚI! " + score + " TAP!";
+      } else {
+        message.textContent = "Hết giờ! Bạn đạt " + score + " TAP!";
+      }
+    }
+  </script>
+
+</body>
+</html>
